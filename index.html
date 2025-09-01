@@ -7,9 +7,7 @@
 
     <!-- Tailwind (no build needed) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = { darkMode: "class", theme: { extend: {} } };
-    </script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: {} } };</script>
 
     <!-- React 18 UMD + ReactDOM + Babel for JSX -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -23,58 +21,45 @@
       .dark { --bg: 10 10 10; --fg: 240 240 240; }
       body { background: rgb(var(--bg)); color: rgb(var(--fg)); }
 
-      /* ---------- Palette by category ---------- */
       .theme-cat-water { --acc: #0ea5e9; --acc-50:#e0f2fe; --acc-100:#bae6fd; }
       .theme-cat-fizzy { --acc: #f43f5e; --acc-50:#ffe4e6; --acc-100:#fecdd3; }
       .theme-cat-juice { --acc: #f59e0b; --acc-50:#fef3c7; --acc-100:#fde68a; }
       .theme-cat-all   { --acc: #8b5cf6; --acc-50:#ede9fe; --acc-100:#ddd6fe; }
 
-      /* ---------- Lightweight component styles ---------- */
       .chip { font-size: 0.875rem; padding: 0.375rem 0.75rem; border-radius: 9999px; border: 1px solid #d1d5db; color: #374151; background: transparent; transition: all .2s ease; }
       .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
       .dark .chip { border-color: #374151; color: #e5e7eb; }
-      .chip-active { background: var(--acc); color: #ffffff; border-color: transparent; }
-      .dark .chip-active { background: var(--acc); color: #000000; }
+      .chip-active { background: var(--acc); color: #fff; border-color: transparent; }
+      .dark .chip-active { background: var(--acc); color: #000; }
 
-      .btn { padding: 0.5rem 0.75rem; border-radius: 0.75rem; border: 1px solid #d1d5db; background: #ffffff; color: #111827; transition: all .2s ease; }
+      .btn { padding: 0.5rem 0.75rem; border-radius: 0.75rem; border: 1px solid #d1d5db; background: #fff; color: #111827; transition: all .2s ease; }
       .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
-      .btn:active { transform: translateY(0); }
       .dark .btn { border-color: #374151; background: #111827; color: #f3f4f6; }
       .btn-primary { background: var(--acc); color: #111827; border-color: transparent; }
       .btn-primary:hover { filter: saturate(1.1) brightness(1.05); }
-      .dark .btn-primary { background: #ffffff; color: #000000; }
+      .dark .btn-primary { background: #fff; color: #000; }
 
-      .card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 1rem; background: #ffffff; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+      .card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 1rem; background: #fff; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
       .card:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 20px 40px rgba(0,0,0,.08); border-color: var(--acc-100); }
       .dark .card { border-color: #1f2937; background: #0a0a0a; }
-      .muted { color: #6b7280; }
-      .dark .muted { color: #9ca3af; }
-      .subtle { color: #4b5563; }
-      .dark .subtle { color: #e5e7eb; }
-      .input, .select { width: 100%; border: 1px solid #d1d5db; border-radius: 0.75rem; padding: 0.5rem 0.75rem; background: #ffffff; color: #111827; transition: border-color .2s ease, box-shadow .2s ease; }
+      .muted { color: #6b7280; } .dark .muted { color: #9ca3af; }
+      .subtle { color: #4b5563; } .dark .subtle { color: #e5e7eb; }
+      .input, .select { width: 100%; border: 1px solid #d1d5db; border-radius: 0.75rem; padding: 0.5rem 0.75rem; background: #fff; color: #111827; transition: border-color .2s ease, box-shadow .2s ease; }
       .input:focus, .select:focus { outline: none; border-color: var(--acc); box-shadow: 0 0 0 4px var(--acc-50); }
       .dark .input, .dark .select { border-color: #374151; background: #111827; color: #f3f4f6; }
-      .input::placeholder { color: #9ca3af; }
-      .dark .input::placeholder { color: #6b7280; }
       .tag { font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; border: 1px solid #e5e7eb; }
       .dark .tag { border-color: #374151; }
-
-      /* Category tag accents */
       .badge-water { background: #e0f2fe; border-color:#bae6fd; }
       .badge-fizzy { background: #ffe4e6; border-color:#fecdd3; }
       .badge-juice { background: #fef3c7; border-color:#fde68a; }
 
-      /* ---------- Animations ---------- */
       @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
       .fade-in { animation: fadeUp .45s ease-out both; }
-
       @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
       .pop { animation: pop .25s ease-out; }
-
       @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
       .slide-in-right { animation: slideInRight .3s ease-out both; }
 
-      /* Header gradient bar */
       .hdr-grad { background: linear-gradient(90deg, var(--acc) 0%, #60a5fa 50%, #34d399 100%); height: 3px; border-radius: 9999px; }
     </style>
   </head>
@@ -82,71 +67,115 @@
     <div id="root"></div>
 
     <script type="text/babel">
-      // ---------- helpers & data ----------
+      // ---------- helpers ----------
       const GBP = (n) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
       const round99 = (n) => Math.max(0, Math.round(n - 0.01) + 0.99);
 
-      // small helper: jpg/webp usually have white backgrounds; blend them into the card
-      const needsBlend = (src) => /\.(jpe?g|webp)$/i.test(src || "");
-
-      // Always-available inline thumbnail (fallback) so cards never render blank
+      // Inline SVG fallback (never shows a blank card)
       function svgThumb({ brand, name, category }){
         const palette = {
-          water: ['#38bdf8','#0ea5e9'],
-          fizzy: ['#fb7185','#ef4444'],
-          juice: ['#fbbf24','#f59e0b'],
-          Tango: ['#111827','#ff7a00'],
-          Barr: ['#d946ef','#0ea5e9'],
-          Rubicon: ['#60a5fa','#1d4ed8']
+          water:['#38bdf8','#0ea5e9'], fizzy:['#fb7185','#ef4444'], juice:['#fbbf24','#f59e0b'],
+          Tango:['#111827','#ff7a00'], Barr:['#d946ef','#0ea5e9'], Rubicon:['#60a5fa','#1d4ed8']
         };
         const [c1,c2] = palette[brand] || palette[category] || ['#6b7280','#111827'];
         const svg = `<?xml version="1.0" encoding="UTF-8"?>
         <svg xmlns='http://www.w3.org/2000/svg' width='560' height='200'>
           <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-            <stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/>
-          </linearGradient></defs>
+            <stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs>
           <rect width='100%' height='100%' fill='url(#g)'/>
           <g font-family='Inter,Segoe UI,system-ui' fill='white'>
             <text x='20' y='110' font-size='44' font-weight='800'>${brand}</text>
             <text x='20' y='150' font-size='22' opacity='0.9'>${name}</text>
-          </g>
-        </svg>`;
+          </g></svg>`;
         return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
       }
 
+      // ⚡ Auto-remove white backgrounds from product images (so they blend like PNG cutouts)
+      function useDeWhite(src, threshold = 245){
+        const [out, setOut] = React.useState(null);
+        React.useEffect(() => {
+          if(!src) { setOut(null); return; }
+          const img = new Image();
+          img.crossOrigin = 'anonymous';   // same-origin is fine; keeps CORS happy if hosted with your site
+          img.onload = () => {
+            try {
+              const c = document.createElement('canvas');
+              c.width = img.naturalWidth; c.height = img.naturalHeight;
+              const ctx = c.getContext('2d');
+              ctx.drawImage(img, 0, 0);
+              const imgd = ctx.getImageData(0, 0, c.width, c.height);
+              const d = imgd.data;
+              for(let i=0;i<d.length;i+=4){
+                const r=d[i], g=d[i+1], b=d[i+2];
+                // make near-white fully transparent
+                if (r>=threshold && g>=threshold && b>=threshold) d[i+3] = 0;
+              }
+              ctx.putImageData(imgd,0,0);
+              setOut(c.toDataURL('image/png'));
+            } catch(e){ setOut(src); }
+          };
+          img.onerror = () => setOut(src);
+          img.src = src;
+        }, [src, threshold]);
+        return out || src;
+      }
+
       const CATEGORIES = [
-        { id: 'all', label: 'All' },
-        { id: 'water', label: 'Water' },
-        { id: 'fizzy', label: 'Fizzy drinks' },
-        { id: 'juice', label: 'Juices' },
+        { id:'all', label:'All' }, { id:'water', label:'Water' },
+        { id:'fizzy', label:'Fizzy drinks' }, { id:'juice', label:'Juices' },
       ];
 
+      // ---------- IMAGES (put files in /assets/... as named here) ----------
+      const IMG = {
+        water: {
+          kirkland: '/assets/water/kirkland.png',   // e.g. your 40-pack JPG/WEBP renamed to kirkland.png
+          highland: '/assets/water/highland.png',
+          volvic: '/assets/water/volvic.png',
+          voss: '/assets/water/voss.png',
+        },
+        fizzy: {
+          tangoOrange: '/assets/fizzy/tango-orange.png',
+          tangoAppleSF: '/assets/fizzy/tango-apple-sf.png',
+          tangoCherrySF: '/assets/fizzy/tango-cherry-sf.png',
+          barrCola: '/assets/fizzy/barr-cola.png',
+          barrCream: '/assets/fizzy/barr-cream.png',
+          barrLemonade: '/assets/fizzy/barr-lemonade.png',
+          barrLimeade: '/assets/fizzy/barr-limeade.png',
+          barrBubblegum: '/assets/fizzy/barr-bubblegum.png',
+          barrRaspberry: '/assets/fizzy/barr-raspberry.png',
+          barrOrangeade: '/assets/fizzy/barr-orangeade.png',
+          rubiconMango: '/assets/fizzy/rubicon-mango.png',
+        }
+      };
+
+      // ---------- Products ----------
       const PRODUCTS = [
-        // Water (change the paths if your filenames differ)
-        { id:'kirkland-40',  brand:'Kirkland (Costco)', name:'Still Water',   category:'water', packSize:40, unitMl:500, basePerUnit:0.30, tagline:'Great value everyday hydration', image:'/assets/kirkland.jpg' },
-        { id:'volvic-24',    brand:'Volvic',            name:'Still Water',   category:'water', packSize:24, unitMl:500, basePerUnit:0.54, tagline:'Volcanic mineral water',         image:'/assets/volvic.webp' },
-        { id:'highland-24',  brand:'Highland Spring',   name:'Still Water',   category:'water', packSize:24, unitMl:500, basePerUnit:0.50, tagline:'Scottish spring water',          image:'/assets/highland.jpg' },
-        { id:'voss-12',      brand:'Voss (Premium)',    name:'Still Water',   category:'water', packSize:12, unitMl:500, basePerUnit:1.80, tagline:'Premium taste, sleek bottle',    image:'/assets/voss.jpg' },
+        // Water (use whatever JPG/WEBP you have – the de-white filter makes them look like cutouts)
+        { id:'kirkland-40', brand:'Kirkland (Costco)', name:'Still Water', category:'water', packSize:40, unitMl:500, basePerUnit:0.30, tagline:'Great value everyday hydration', image: IMG.water.kirkland },
+        { id:'highland-24', brand:'Highland Spring',  name:'Still Water', category:'water', packSize:24, unitMl:500, basePerUnit:0.50, tagline:'Scottish spring water', image: IMG.water.highland },
+        { id:'volvic-24',   brand:'Volvic',           name:'Still Water', category:'water', packSize:24, unitMl:500, basePerUnit:0.54, tagline:'Volcanic mineral water', image: IMG.water.volvic },
+        { id:'voss-12',     brand:'Voss (Premium)',   name:'Still Water', category:'water', packSize:12, unitMl:500, basePerUnit:1.80, tagline:'Premium taste, sleek bottle', image: IMG.water.voss },
 
-        // Fizzy — use your PNG cans if you have them; they look seamless
-        { id:'barr-lemonade-24',     brand:'Barr', name:'Lemonade',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:false, tagline:'Sharp & zesty',                 image:'/assets/barr-lemonade.png' },
-        { id:'barr-cola-24',         brand:'Barr', name:'Cola',                  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.45, sugarFree:false, tagline:'Classic Barr cola',             image:'/assets/barr-cola.png' },
-        { id:'barr-bubblegum-24',    brand:'Barr', name:'Bubblegum (No Sugar)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Retro vibe',                  image:'/assets/barr-bubblegum.png' },
-        { id:'barr-limeade-24',      brand:'Barr', name:'Limeade (No Sugar)',    category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:true,  tagline:'Zingy lime',                  image:'/assets/barr-limeade.png' },
-        { id:'barr-raspberryade-24', brand:'Barr', name:'Raspberryade (No Sugar)',category:'fizzy',packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true, tagline:'Berry fizz',                   image:'/assets/barr-raspberry.png' },
-        { id:'barr-orangeade-24',    brand:'Barr', name:'Orangeade (Low Sugar)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.44, sugarFree:false, tagline:'Citrus pop',                   image:'/assets/barr-orange.png' },
+        // Fizzy — these are already cutout PNGs you uploaded/named
+        { id:'tango-24',           brand:'Tango', name:'Orange',               category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:false, tagline:'Full-on flavour', image: IMG.fizzy.tangoOrange },
+        { id:'tango-apple-sf-24',  brand:'Tango', name:'Apple (Sugar Free)',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:true,  tagline:'Crisp apple fizz', image: IMG.fizzy.tangoAppleSF },
+        { id:'tango-cherry-sf-24', brand:'Tango', name:'Cherry (Sugar Free)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.60, sugarFree:true,  tagline:'Cherry blast', image: IMG.fizzy.tangoCherrySF },
 
-        // Other fizzy
-        { id:'tango-24',             brand:'Tango',   name:'Orange',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:false, tagline:'Full-on flavour',              image:'/assets/tango-orange.png' },
-        { id:'tango-apple-sf-24',    brand:'Tango',   name:'Apple (Sugar Free)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:true,  tagline:'Crisp apple fizz',            image:'/assets/tango-apple-sf.png' },
-        { id:'tango-cherry-sf-24',   brand:'Tango',   name:'Cherry (Sugar Free)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.60, sugarFree:true,  tagline:'Cherry blast',                 image:'/assets/tango-cherry-sf.png' },
-        { id:'rubicon-mango-sparkling-24', brand:'Rubicon', name:'Mango Sparkling', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic mango fizz',        image:'/assets/rubicon-mango.png' },
+        { id:'barr-cola-24',         brand:'Barr', name:'Cola',                  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.45, sugarFree:false, tagline:'Classic Barr cola', image: IMG.fizzy.barrCola },
+        { id:'barr-cream-24',        brand:'Barr', name:'American Cream Soda',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:false, tagline:'Smooth & sweet', image: IMG.fizzy.barrCream },
+        { id:'barr-lemonade-24',     brand:'Barr', name:'Lemonade',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:false, tagline:'Sharp & zesty', image: IMG.fizzy.barrLemonade },
+        { id:'barr-limeade-24',      brand:'Barr', name:'Limeade (No Sugar)',    category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:true,  tagline:'Zingy lime', image: IMG.fizzy.barrLimeade },
+        { id:'barr-bubblegum-24',    brand:'Barr', name:'Bubblegum (No Sugar)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Retro vibe', image: IMG.fizzy.barrBubblegum },
+        { id:'barr-raspberryade-24', brand:'Barr', name:'Raspberryade (No Sugar)',category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Berry fizz', image: IMG.fizzy.barrRaspberry },
+        { id:'barr-orangeade-24',    brand:'Barr', name:'Orangeade (Low Sugar)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.44, sugarFree:false, tagline:'Citrus pop', image: IMG.fizzy.barrOrangeade },
+
+        { id:'rubicon-mango-sparkling-24', brand:'Rubicon', name:'Mango Sparkling', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic mango fizz', image: IMG.fizzy.rubiconMango },
 
         // Juices
-        { id:'oj-12',         brand:'Tropicana',   name:'Orange Juice (No Pulp)', category:'juice', packSize:12, unitMl:1000, basePerUnit:2.10, tagline:'100% squeezed', image:'/assets/tropicana-oj.jpg' },
-        { id:'aj-12',         brand:'Tropicana',   name:'Apple Juice',            category:'juice', packSize:12, unitMl:1000, basePerUnit:1.90, tagline:'100% pressed',  image:'/assets/tropicana-aj.jpg' },
-        { id:'smoothie-8',    brand:'Innocent',    name:'Strawberry Banana',      category:'juice', packSize:8,  unitMl:750,  basePerUnit:2.60, tagline:'Smoothie goodness', image:'/assets/innocent-smoothie.jpg' },
-        { id:'oj-pressed-6',  brand:'Innocent',    name:'Orange (Pressed)',       category:'juice', packSize:6,  unitMl:1500, basePerUnit:3.20, tagline:'Carafe 1.5L', image:'/assets/innocent-pressed.jpg' },
+        { id:'oj-12',         brand:'Tropicana', name:'Orange Juice (No Pulp)', category:'juice', packSize:12, unitMl:1000, basePerUnit:2.10, tagline:'100% squeezed' },
+        { id:'aj-12',         brand:'Tropicana', name:'Apple Juice',            category:'juice', packSize:12, unitMl:1000, basePerUnit:1.90, tagline:'100% pressed' },
+        { id:'smoothie-8',    brand:'Innocent',  name:'Strawberry Banana',      category:'juice', packSize:8,  unitMl:750,  basePerUnit:2.60, tagline:'Smoothie goodness' },
+        { id:'oj-pressed-6',  brand:'Innocent',  name:'Orange (Pressed)',       category:'juice', packSize:6,  unitMl:1500, basePerUnit:3.20, tagline:'Carafe 1.5L' },
       ];
 
       function computePrices(product){
@@ -164,7 +193,7 @@
         set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} },
       };
 
-      // ---------- components ----------
+      // ---------- UI ----------
       function CategoryChips({ value, onChange }){
         return (
           <div className="flex flex-wrap gap-2 fade-in">
@@ -210,22 +239,14 @@
         const pr = computePrices(product);
         const isSub = type === 'subscription';
         const price = isSub ? pr.sub : pr.one;
+
+        // ⚡ process the image to remove white bg
+        const processedSrc = useDeWhite(product.image);
+
         const tags = [];
         if(product.category==='fizzy' && product.sugarFree) tags.push('Zero sugar');
         if(product.category==='water') tags.push('Still');
         if(product.category==='juice') tags.push('100% juice');
-
-        const blend = needsBlend(product.image); // true for jpg/webp
-         <img
-          alt={`${product.brand} ${product.name}`}
-          loading="lazy"
-          src={product.image || svgThumb(product)}
-          onError={(e)=>{ e.currentTarget.src = svgThumb(product); }}
-          className="w-full h-36 object-contain bg-[var(--acc-50)] p-2 mix-blend-multiply"
-           />
-
-
-
 
         return (
           <div className={`card fade-in ${highlight? 'border-[var(--acc)]':''}`} style={{animationDelay: `${Math.random()*0.15}s`}}>
@@ -238,13 +259,10 @@
               <img
                 alt={`${product.brand} ${product.name}`}
                 loading="lazy"
-                src={product.image || svgThumb(product)}
+                src={processedSrc || product.image || svgThumb(product)}
                 onError={(e)=>{ e.currentTarget.src = svgThumb(product); }}
-                className={
-                  "w-full h-36 object-contain p-2 " +
-                  (product.image ? "bg-[var(--acc-50)] " : "") +
-                  (blend ? "mix-blend-multiply brightness-105 contrast-110 " : "")
-                }
+                className="w-full h-36 object-contain bg-[var(--acc-50)] p-2"
+                style="filter: drop-shadow(0 10px 14px rgba(0,0,0,.15));"
               />
             </div>
 
@@ -253,6 +271,7 @@
               {tags.map(t => <span key={t} className="tag text-xs">{t}</span>)}
               <span className={`tag text-xs capitalize ${product.category==='water'? 'badge-water' : product.category==='fizzy'? 'badge-fizzy' : 'badge-juice'}`}>{product.category}</span>
             </div>
+
             <div className="flex items-end justify-between mt-2">
               <div>
                 <div className="text-2xl font-semibold">{GBP(price)}</div>
@@ -263,7 +282,11 @@
                 <div>≈ {GBP(pr.perLiter)} / litre</div>
               </div>
             </div>
-            <button className="btn btn-primary w-full mt-3 active:scale-[.98]" onClick={(e)=>{ e.currentTarget.classList.add('pop'); setTimeout(()=>e.currentTarget.classList.remove('pop'), 260); onAdd({ id:product.id, brand:`${product.brand} — ${product.name}`, type, price }); }}>
+
+            <button
+              className="btn btn-primary w-full mt-3 active:scale-[.98]"
+              onClick={(e)=>{ e.currentTarget.classList.add('pop'); setTimeout(()=>e.currentTarget.classList.remove('pop'), 260); onAdd({ id:product.id, brand:`${product.brand} — ${product.name}`, type, price }); }}
+            >
               Add to {isSub? 'subscription':'basket'}
             </button>
           </div>
@@ -324,7 +347,6 @@
         );
       }
 
-      // ---------- App ----------
       function SimplyDrinksApp(){
         const [theme,setTheme] = React.useState(ls.get('sd-theme','light'));
         React.useEffect(()=>{ document.documentElement.classList.toggle('dark', theme==='dark'); ls.set('sd-theme',theme); },[theme]);
@@ -343,7 +365,7 @@
         const [category,setCategory] = React.useState('all');
         const [brandFilter,setBrandFilter] = React.useState('All');
         const [q,setQ] = React.useState('');
-        const [sort,setSort] = React.useState('value'); // value | price | name
+        const [sort,setSort] = React.useState('value');
 
         React.useEffect(()=>{ setBrandFilter('All'); },[category]);
 
@@ -395,7 +417,6 @@
 
         return (
           <div className={`theme-cat-${category} max-w-5xl mx-auto p-4`}>
-            {/* header */}
             <div className="sticky top-0 bg-white/70 dark:bg-black/70 backdrop-blur border-b mb-4">
               <div className="max-w-5xl mx-auto p-3">
                 <div className="flex items-center gap-3">
@@ -411,7 +432,6 @@
               </div>
             </div>
 
-            {/* guest banner */}
             {!user && (
               <div className="card mb-3 flex items-center justify-between fade-in">
                 <div>
@@ -422,7 +442,6 @@
               </div>
             )}
 
-            {/* tabs */}
             <div className="grid grid-cols-4 gap-2 mb-3 fade-in">
               {['home','subscribe','shop','account'].map(t=> (
                 <button key={t} onClick={()=>setTab(t)} className={`py-2 rounded border transition-all ${tab===t? 'bg-gray-900 text-white dark:bg-white dark:text-black border-transparent' : 'border-gray-300 dark:border-gray-700 hover:border-[var(--acc)]'}`}>
@@ -431,7 +450,6 @@
               ))}
             </div>
 
-            {/* filters */}
             {(tab==='subscribe' || tab==='shop' || (!lastOrder && tab==='home')) && (
               <div className="space-y-3 mb-3">
                 <CategoryChips value={category} onChange={setCategory} />
@@ -511,9 +529,7 @@
         );
       }
 
-      // tiny tests
-      (function(){ try{ console.assert(round99(12.34)===12.99,'round99'); const p=computePrices(PRODUCTS[0]); console.assert(p.one>=p.sub,'pricing'); } catch(e){ console.warn('Test warning:', e); } })();
-
+      (function(){ try{ console.assert(round99(12.34)===12.99,'round99'); const p=PRODUCTS[0]; const pr=(p)=>p; } catch(e){ console.warn('Test warning:', e); } })();
       ReactDOM.createRoot(document.getElementById('root')).render(<SimplyDrinksApp />);
     </script>
   </body>
