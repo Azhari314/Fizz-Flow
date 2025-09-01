@@ -216,6 +216,16 @@
         if(product.category==='juice') tags.push('100% juice');
 
         const blend = needsBlend(product.image); // true for jpg/webp
+         <img
+          alt={`${product.brand} ${product.name}`}
+          loading="lazy"
+          src={product.image || svgThumb(product)}
+          onError={(e)=>{ e.currentTarget.src = svgThumb(product); }}
+          className="w-full h-36 object-contain bg-[var(--acc-50)] p-2 mix-blend-multiply"
+           />
+
+
+
 
         return (
           <div className={`card fade-in ${highlight? 'border-[var(--acc)]':''}`} style={{animationDelay: `${Math.random()*0.15}s`}}>
