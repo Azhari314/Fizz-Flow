@@ -86,6 +86,9 @@
       const GBP = (n) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
       const round99 = (n) => Math.max(0, Math.round(n - 0.01) + 0.99);
 
+      // small helper: jpg/webp usually have white backgrounds; blend them into the card
+      const needsBlend = (src) => /\.(jpe?g|webp)$/i.test(src || "");
+
       // Always-available inline thumbnail (fallback) so cards never render blank
       function svgThumb({ brand, name, category }){
         const palette = {
@@ -99,12 +102,9 @@
         const [c1,c2] = palette[brand] || palette[category] || ['#6b7280','#111827'];
         const svg = `<?xml version="1.0" encoding="UTF-8"?>
         <svg xmlns='http://www.w3.org/2000/svg' width='560' height='200'>
-          <defs>
-            <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-              <stop offset='0%' stop-color='${c1}'/>
-              <stop offset='100%' stop-color='${c2}'/>
-            </linearGradient>
-          </defs>
+          <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+            <stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/>
+          </linearGradient></defs>
           <rect width='100%' height='100%' fill='url(#g)'/>
           <g font-family='Inter,Segoe UI,system-ui' fill='white'>
             <text x='20' y='110' font-size='44' font-weight='800'>${brand}</text>
@@ -122,59 +122,40 @@
       ];
 
       const PRODUCTS = [
-  // Water
-  { id:'kirkland-40',  brand:'Kirkland (Costco)', name:'Still Water',   category:'water', packSize:40, unitMl:500, basePerUnit:0.30, tagline:'Great value everyday hydration',
-    image:'assets/715+mmuXCmL._AC_SL1500_.jpg' },
-  { id:'volvic-24',    brand:'Volvic',            name:'Still Water',   category:'water', packSize:24, unitMl:500, basePerUnit:0.54, tagline:'Volcanic mineral water',
-    image:'assets/OIP.webp' },
-  { id:'highland-24',  brand:'Highland Spring',   name:'Still Water',   category:'water', packSize:24, unitMl:500, basePerUnit:0.50, tagline:'Scottish spring water',
-    image:'assets/download.webp' },
-  { id:'voss-12',      brand:'Voss (Premium)',    name:'Still Water',   category:'water', packSize:12, unitMl:500, basePerUnit:1.80, tagline:'Premium taste, sleek bottle',
-    image:'assets/15d0dced672b11d7649725af39648985.jpg' },
+        // Water (change the paths if your filenames differ)
+        { id:'kirkland-40',  brand:'Kirkland (Costco)', name:'Still Water',   category:'water', packSize:40, unitMl:500, basePerUnit:0.30, tagline:'Great value everyday hydration', image:'/assets/kirkland.jpg' },
+        { id:'volvic-24',    brand:'Volvic',            name:'Still Water',   category:'water', packSize:24, unitMl:500, basePerUnit:0.54, tagline:'Volcanic mineral water',         image:'/assets/volvic.webp' },
+        { id:'highland-24',  brand:'Highland Spring',   name:'Still Water',   category:'water', packSize:24, unitMl:500, basePerUnit:0.50, tagline:'Scottish spring water',          image:'/assets/highland.jpg' },
+        { id:'voss-12',      brand:'Voss (Premium)',    name:'Still Water',   category:'water', packSize:12, unitMl:500, basePerUnit:1.80, tagline:'Premium taste, sleek bottle',    image:'/assets/voss.jpg' },
 
-  // Fizzy drinks — Tango, Barr, Rubicon
+        // Fizzy — use your PNG cans if you have them; they look seamless
+        { id:'barr-lemonade-24',     brand:'Barr', name:'Lemonade',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:false, tagline:'Sharp & zesty',                 image:'/assets/barr-lemonade.png' },
+        { id:'barr-cola-24',         brand:'Barr', name:'Cola',                  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.45, sugarFree:false, tagline:'Classic Barr cola',             image:'/assets/barr-cola.png' },
+        { id:'barr-bubblegum-24',    brand:'Barr', name:'Bubblegum (No Sugar)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Retro vibe',                  image:'/assets/barr-bubblegum.png' },
+        { id:'barr-limeade-24',      brand:'Barr', name:'Limeade (No Sugar)',    category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:true,  tagline:'Zingy lime',                  image:'/assets/barr-limeade.png' },
+        { id:'barr-raspberryade-24', brand:'Barr', name:'Raspberryade (No Sugar)',category:'fizzy',packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true, tagline:'Berry fizz',                   image:'/assets/barr-raspberry.png' },
+        { id:'barr-orangeade-24',    brand:'Barr', name:'Orangeade (Low Sugar)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.44, sugarFree:false, tagline:'Citrus pop',                   image:'/assets/barr-orange.png' },
 
-  // Tango
-  { id:'tango-24',             brand:'Tango', name:'Orange',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:false, tagline:'Full-on flavour',
-    image:'assets/5010102240810_T1.jpg' },
-  { id:'tango-apple-sf-24',    brand:'Tango', name:'Apple (Sugar Free)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:true,  tagline:'Crisp apple fizz',
-    image:'assets/5010102343320.jpg' },
-  { id:'tango-cherry-sf-24',   brand:'Tango', name:'Cherry (Sugar Free)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.60, sugarFree:true,  tagline:'Cherry blast',
-    image:'assets/5010102244429_T1.jpg' },
+        // Other fizzy
+        { id:'tango-24',             brand:'Tango',   name:'Orange',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:false, tagline:'Full-on flavour',              image:'/assets/tango-orange.png' },
+        { id:'tango-apple-sf-24',    brand:'Tango',   name:'Apple (Sugar Free)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:true,  tagline:'Crisp apple fizz',            image:'/assets/tango-apple-sf.png' },
+        { id:'tango-cherry-sf-24',   brand:'Tango',   name:'Cherry (Sugar Free)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.60, sugarFree:true,  tagline:'Cherry blast',                 image:'/assets/tango-cherry-sf.png' },
+        { id:'rubicon-mango-sparkling-24', brand:'Rubicon', name:'Mango Sparkling', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic mango fizz',        image:'/assets/rubicon-mango.png' },
 
-  // Barr
-  { id:'barr-cola-24',         brand:'Barr',  name:'Cola',                 category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.45, sugarFree:false, tagline:'Classic Barr cola',
-    image:'assets/barr_330ml-cola-plain_main-prdoduct-image_720x683.png' },
-  { id:'barr-cream-24',        brand:'Barr',  name:'American Cream Soda',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:false, tagline:'Smooth & sweet',
-    image:'assets/barr_american-cream-soda-330ml_main-prdoduct-image_720x683.png' },
-  { id:'barr-lemonade-24',     brand:'Barr',  name:'Lemonade',             category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:false, tagline:'Sharp & zesty',
-    image:'assets/barr_lemonade-330ml_main-prdoduct-image_720x683.png' },
-  { id:'barr-limeade-24',      brand:'Barr',  name:'Limeade (No Sugar)',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:true,  tagline:'Zingy lime',
-    image:'assets/barr_limeade-330ml_main-prdoduct-image_720x683.png' },
-  { id:'barr-bubblegum-24',    brand:'Barr',  name:'Bubblegum (No Sugar)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Retro vibe',
-    image:'assets/barr_bubblegum-330ml_main-prdoduct-image_720x683.png' },
-  { id:'barr-raspberryade-24', brand:'Barr',  name:'Raspberryade (No Sugar)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true, tagline:'Berry fizz',
-    image:'assets/barr_raspberry-330ml-plain_main-prdoduct-image_720x683.png' },
-
-  // Rubicon
-  { id:'rubicon-mango-sparkling-24', brand:'Rubicon', name:'Mango Sparkling', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic mango fizz',
-    image:'assets/5000382111597.jpg' },
-
-  // Juices (no images provided—will use the nice SVG fallback)
-  { id:'oj-12',         brand:'Tropicana', name:'Orange Juice (No Pulp)', category:'juice', packSize:12, unitMl:1000, basePerUnit:2.10, tagline:'100% squeezed' },
-  { id:'aj-12',         brand:'Tropicana', name:'Apple Juice',            category:'juice', packSize:12, unitMl:1000, basePerUnit:1.90, tagline:'100% pressed' },
-  { id:'smoothie-8',    brand:'Innocent',  name:'Strawberry Banana',      category:'juice', packSize:8,  unitMl:750,  basePerUnit:2.60, tagline:'Smoothie goodness' },
-  { id:'oj-pressed-6',  brand:'Innocent',  name:'Orange (Pressed)',       category:'juice', packSize:6,  unitMl:1500, basePerUnit:3.20, tagline:'Carafe 1.5L' },
-];
-
+        // Juices
+        { id:'oj-12',         brand:'Tropicana',   name:'Orange Juice (No Pulp)', category:'juice', packSize:12, unitMl:1000, basePerUnit:2.10, tagline:'100% squeezed', image:'/assets/tropicana-oj.jpg' },
+        { id:'aj-12',         brand:'Tropicana',   name:'Apple Juice',            category:'juice', packSize:12, unitMl:1000, basePerUnit:1.90, tagline:'100% pressed',  image:'/assets/tropicana-aj.jpg' },
+        { id:'smoothie-8',    brand:'Innocent',    name:'Strawberry Banana',      category:'juice', packSize:8,  unitMl:750,  basePerUnit:2.60, tagline:'Smoothie goodness', image:'/assets/innocent-smoothie.jpg' },
+        { id:'oj-pressed-6',  brand:'Innocent',    name:'Orange (Pressed)',       category:'juice', packSize:6,  unitMl:1500, basePerUnit:3.20, tagline:'Carafe 1.5L', image:'/assets/innocent-pressed.jpg' },
+      ];
 
       function computePrices(product){
-        const subPackPrice = product.basePerUnit * product.packSize; // subscription saves vs one-off (below)
+        const subPackPrice = product.basePerUnit * product.packSize;
         const sub = round99(subPackPrice);
-        const one = round99(sub * 1.25); // ~25% uplift for one-off
+        const one = round99(sub * 1.25);
         const perUnitSub = round99(sub / product.packSize);
         const litres = (product.unitMl * product.packSize) / 1000;
-        const perLiter = Math.round((sub / litres) * 100) / 100; // keep per-litre readable
+        const perLiter = Math.round((sub / litres) * 100) / 100;
         return { sub, one, perUnitSub, perLiter };
       }
 
@@ -197,7 +178,7 @@
       }
 
       function BrandChips({ value, onChange, brands }){
-        if(!brands || brands.length<=1) return null; // hide if only one or none
+        if(!brands || brands.length<=1) return null;
         return (
           <div className="flex flex-wrap gap-2 fade-in">
             {["All", ...brands].map(b => (
@@ -233,22 +214,30 @@
         if(product.category==='fizzy' && product.sugarFree) tags.push('Zero sugar');
         if(product.category==='water') tags.push('Still');
         if(product.category==='juice') tags.push('100% juice');
+
+        const blend = needsBlend(product.image); // true for jpg/webp
+
         return (
           <div className={`card fade-in ${highlight? 'border-[var(--acc)]':''}`} style={{animationDelay: `${Math.random()*0.15}s`}}>
             <div className="flex items-center justify-between">
               <div className="font-medium">{product.brand} — {product.name}</div>
               {highlight && <span className="tag text-blue-600 border-blue-300">Best value</span>}
             </div>
-            {/* Always show an image: real if provided, otherwise an inline SVG; if real fails, fall back to SVG */}
+
             <div className="relative mb-2 overflow-hidden rounded-xl border" style={{borderColor:'var(--acc-100)'}}>
               <img
                 alt={`${product.brand} ${product.name}`}
                 loading="lazy"
                 src={product.image || svgThumb(product)}
                 onError={(e)=>{ e.currentTarget.src = svgThumb(product); }}
-                className="w-full h-36 object-contain bg-[var(--acc-50)] p-2"
+                className={
+                  "w-full h-36 object-contain p-2 " +
+                  (product.image ? "bg-[var(--acc-50)] " : "") +
+                  (blend ? "mix-blend-multiply brightness-105 contrast-110 " : "")
+                }
               />
             </div>
+
             <div className="muted">{product.packSize}×{product.unitMl}ml • {product.tagline}</div>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {tags.map(t => <span key={t} className="tag text-xs">{t}</span>)}
@@ -346,7 +335,6 @@
         const [q,setQ] = React.useState('');
         const [sort,setSort] = React.useState('value'); // value | price | name
 
-        // reset brand filter when switching main category
         React.useEffect(()=>{ setBrandFilter('All'); },[category]);
 
         const visibleProducts = React.useMemo(()=>{
@@ -357,7 +345,6 @@
             const qq = q.trim().toLowerCase();
             list = list.filter(p => (p.brand+" "+p.name+" "+(p.tagline||'')).toLowerCase().includes(qq));
           }
-          // sort
           list = list.map(p=>({ ...p, _prices: computePrices(p) }));
           if(sort==='value') list.sort((a,b)=> a._prices.perLiter - b._prices.perLiter);
           else if(sort==='price') list.sort((a,b)=> a._prices.sub - b._prices.sub);
@@ -394,7 +381,6 @@
         }
 
         const best = PRODUCTS.find(p=>p.id===bestValueId) || PRODUCTS[0];
-
         const searchPlaceholder = category==='all' ? 'Search brand, drink, flavour…' : `Search ${CATEGORIES.find(c=>c.id===category).label.toLowerCase()}…`;
 
         return (
