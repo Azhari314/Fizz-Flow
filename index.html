@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fizz & Flow — Water, Fizzy Drinks & Juices</title>
 
-    <!-- Tailwind (no build) -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: "class", theme: { extend: {} } };</script>
 
-    <!-- React 18 UMD + ReactDOM + Babel (JSX in browser) -->
+    <!-- React 18 UMD + ReactDOM + Babel (JSX compiler) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- IMPORTANT: presets added so JSX compiles -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <meta name="theme-color" content="#0ea5e9" />
@@ -22,20 +21,19 @@
       .dark { --bg: 10 10 10; --fg: 240 240 240; }
       body { background: rgb(var(--bg)); color: rgb(var(--fg)); }
 
-      /* Category accent palettes */
       .theme-cat-water { --acc: #0ea5e9; --acc-50:#e0f2fe; --acc-100:#bae6fd; }
       .theme-cat-fizzy { --acc: #f43f5e; --acc-50:#ffe4e6; --acc-100:#fecdd3; }
       .theme-cat-juice { --acc: #f59e0b; --acc-50:#fef3c7; --acc-100:#fde68a; }
       .theme-cat-all   { --acc: #8b5cf6; --acc-50:#ede9fe; --acc-100:#ddd6fe; }
 
-      .chip { font-size: .875rem; padding: .375rem .75rem; border-radius:9999px; border:1px solid #d1d5db; color:#374151; background:transparent; transition:all .2s; }
+      .chip { font-size:.875rem; padding:.375rem .75rem; border-radius:9999px; border:1px solid #d1d5db; color:#374151; background:transparent; transition:all .2s; }
       .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
       .dark .chip { border-color:#374151; color:#e5e7eb; }
       .chip-active { background: var(--acc); color:#fff; border-color:transparent; }
       .dark .chip-active { background: var(--acc); color:#000; }
 
       .btn { padding:.5rem .75rem; border-radius:.75rem; border:1px solid #d1d5db; background:#fff; color:#111827; transition:all .2s; }
-      .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+      .btn:hover { transform: translateY(-1px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
       .dark .btn { border-color:#374151; background:#111827; color:#f3f4f6; }
       .btn-primary { background:var(--acc); color:#111827; border-color:transparent; }
       .btn-primary:hover { filter:saturate(1.1) brightness(1.05); }
@@ -65,22 +63,37 @@
 
       .hdr-grad { background: linear-gradient(90deg, var(--acc) 0%, #60a5fa 50%, #34d399 100%); height:3px; border-radius:9999px; }
 
-      /* --- Image blending to hide white product backgrounds --- */
-      .img-wrap { background: color-mix(in srgb, var(--acc-50) 80%, #fff 20%); }
-      .drink-img { mix-blend-mode: multiply; image-rendering: auto; }
-      .dark .drink-img { mix-blend-mode: screen; }
+      /* image blending to hide white product backgrounds */
+      .img-wrap { background: #f5f7ff; } /* gentle backdrop, works everywhere */
+      .drink-img { mix-blend-mode:multiply; image-rendering:auto; }
+      .dark .drink-img { mix-blend-mode:screen; }
+
+      /* on-page error box (shows JS errors if boot fails) */
+      #boot-error { display:none; white-space:pre-wrap; background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; padding:12px; border-radius:12px; max-width:900px; margin:12px auto; }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <noscript><div style="padding:12px;background:#fee2e2;color:#7f1d1d;text-align:center">This page needs JavaScript enabled.</div></noscript>
+    <pre id="boot-error"></pre>
+    <div id="root">Loading…</div>
 
-    <!-- Run the app -->
-    <script type="text/babel" data-presets="react,env">
-      // ---------- helpers & data ----------
-      const GBP = (n) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
+    <script>
+      // If anything throws during boot, show it on the page so it’s not just blank.
+      window.addEventListener('error', e => {
+        const box = document.getElementById('boot-error');
+        if (box) { box.style.display='block'; box.textContent = (e.error && e.error.stack) || e.message; }
+      });
+      window.addEventListener('unhandledrejection', e => {
+        const box = document.getElementById('boot-error');
+        if (box) { box.style.display='block'; box.textContent = (e.reason && e.reason.stack) || String(e.reason); }
+      });
+    </script>
+
+    <!-- App -->
+    <script type="text/babel" data-presets="react">
+      const GBP = (n) => new Intl.NumberFormat("en-GB", { style:"currency", currency:"GBP" }).format(n);
       const round99 = (n) => Math.max(0, Math.round(n - 0.01) + 0.99);
 
-      // Small inline SVG fallback (used if any asset is missing)
       function svgThumb({ brand, name, category }){
         const palette = {
           water: ['#38bdf8','#0ea5e9'],
@@ -91,11 +104,9 @@
           Rubicon: ['#60a5fa','#1d4ed8']
         };
         const [c1,c2] = palette[brand] || palette[category] || ['#6b7280','#111827'];
-        const svg = `<?xml version="1.0" encoding="UTF-8"?>
-        <svg xmlns='http://www.w3.org/2000/svg' width='560' height='200'>
+        const svg = `<?xml version="1.0"?><svg xmlns='http://www.w3.org/2000/svg' width='560' height='200'>
           <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-            <stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/>
-          </linearGradient></defs>
+          <stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs>
           <rect width='100%' height='100%' fill='url(#g)'/>
           <g font-family='Inter,Segoe UI,system-ui' fill='white'>
             <text x='20' y='110' font-size='44' font-weight='800'>${brand}</text>
@@ -105,47 +116,31 @@
       }
 
       const CATEGORIES = [
-        { id: 'all', label: 'All' },
-        { id: 'water', label: 'Water' },
-        { id: 'fizzy', label: 'Fizzy drinks' },
-        { id: 'juice', label: 'Juices' },
+        { id:'all', label:'All' },
+        { id:'water', label:'Water' },
+        { id:'fizzy', label:'Fizzy drinks' },
+        { id:'juice', label:'Juices' },
       ];
 
-      /*  Put these image files in your repo exactly like this:
-          /assets/water/kirkland.png
-          /assets/water/highland.png
-          /assets/water/volvic.png
-          /assets/water/voss.png
-          /assets/fizzy/barr-cola.png
-          /assets/fizzy/barr-lemonade.png
-          /assets/fizzy/barr-bubblegum.png
-          /assets/fizzy/barr-limeade.png
-          /assets/fizzy/barr-raspberryade.png
-          /assets/fizzy/barr-cream-soda.png
-          /assets/fizzy/tango-orange.png
-          /assets/fizzy/tango-apple-sf.png
-          /assets/fizzy/tango-cherry-sf.png
-          /assets/fizzy/rubicon-mango-sparkling.png
-      */
-
+      /* Put images in your repo with these exact paths/names: */
       const PRODUCTS = [
         // Water
-        { id:'kirkland-40',  brand:'Kirkland (Costco)', name:'Still Water', category:'water', packSize:40, unitMl:500, basePerUnit:0.30, tagline:'Great value everyday hydration', image:'/assets/water/kirkland.png' },
-        { id:'highland-24',  brand:'Highland Spring',   name:'Still Water', category:'water', packSize:24, unitMl:500, basePerUnit:0.50, tagline:'Scottish spring water',          image:'/assets/water/highland.png' },
-        { id:'volvic-24',    brand:'Volvic',            name:'Still Water', category:'water', packSize:24, unitMl:500, basePerUnit:0.54, tagline:'Volcanic mineral water',         image:'/assets/water/volvic.png' },
-        { id:'voss-12',      brand:'Voss (Premium)',    name:'Still Water', category:'water', packSize:12, unitMl:500, basePerUnit:1.80, tagline:'Premium taste, sleek bottle',    image:'/assets/water/voss.png' },
+        { id:'kirkland-40', brand:'Kirkland (Costco)', name:'Still Water', category:'water', packSize:40, unitMl:500, basePerUnit:0.30, tagline:'Great value everyday hydration', image:'/assets/water/kirkland.png' },
+        { id:'highland-24', brand:'Highland Spring',   name:'Still Water', category:'water', packSize:24, unitMl:500, basePerUnit:0.50, tagline:'Scottish spring water',          image:'/assets/water/highland.png' },
+        { id:'volvic-24',   brand:'Volvic',            name:'Still Water', category:'water', packSize:24, unitMl:500, basePerUnit:0.54, tagline:'Volcanic mineral water',         image:'/assets/water/volvic.png' },
+        { id:'voss-12',     brand:'Voss (Premium)',    name:'Still Water', category:'water', packSize:12, unitMl:500, basePerUnit:1.80, tagline:'Premium taste, sleek bottle',    image:'/assets/water/voss.png' },
 
-        // Fizzy — Tango, Barr, Rubicon
-        { id:'tango-24',              brand:'Tango', name:'Orange',               category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:false, tagline:'Full-on flavour', image:'/assets/fizzy/tango-orange.png' },
-        { id:'tango-apple-sf-24',     brand:'Tango', name:'Apple (Sugar Free)',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:true,  tagline:'Crisp apple fizz', image:'/assets/fizzy/tango-apple-sf.png' },
-        { id:'tango-cherry-sf-24',    brand:'Tango', name:'Cherry (Sugar Free)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.60, sugarFree:true,  tagline:'Cherry blast',    image:'/assets/fizzy/tango-cherry-sf.png' },
+        // Fizzy
+        { id:'tango-24',           brand:'Tango', name:'Orange',               category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:false, tagline:'Full-on flavour', image:'/assets/fizzy/tango-orange.png' },
+        { id:'tango-apple-sf-24',  brand:'Tango', name:'Apple (Sugar Free)',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.55, sugarFree:true,  tagline:'Crisp apple fizz', image:'/assets/fizzy/tango-apple-sf.png' },
+        { id:'tango-cherry-sf-24', brand:'Tango', name:'Cherry (Sugar Free)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.60, sugarFree:true,  tagline:'Cherry blast',    image:'/assets/fizzy/tango-cherry-sf.png' },
 
-        { id:'barr-cola-24',          brand:'Barr',  name:'Cola',                  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.45, sugarFree:false, tagline:'Classic Barr cola',  image:'/assets/fizzy/barr-cola.png' },
-        { id:'barr-lemonade-24',      brand:'Barr',  name:'Lemonade',              category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:false, tagline:'Sharp & zesty',      image:'/assets/fizzy/barr-lemonade.png' },
-        { id:'barr-limeade-24',       brand:'Barr',  name:'Limeade (No Sugar)',    category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:true,  tagline:'Zingy lime',        image:'/assets/fizzy/barr-limeade.png' },
-        { id:'barr-bubblegum-24',     brand:'Barr',  name:'Bubblegum (No Sugar)',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Retro vibe',        image:'/assets/fizzy/barr-bubblegum.png' },
-        { id:'barr-raspberryade-24',  brand:'Barr',  name:'Raspberryade (No Sugar)',category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true, tagline:'Berry fizz',        image:'/assets/fizzy/barr-raspberryade.png' },
-        { id:'barr-cream-24',         brand:'Barr',  name:'American Cream Soda',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:false, tagline:'Smooth & sweet',     image:'/assets/fizzy/barr-cream-soda.png' },
+        { id:'barr-cola-24',         brand:'Barr', name:'Cola',                 category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.45, sugarFree:false, tagline:'Classic Barr cola',  image:'/assets/fizzy/barr-cola.png' },
+        { id:'barr-lemonade-24',     brand:'Barr', name:'Lemonade',             category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:false, tagline:'Sharp & zesty',      image:'/assets/fizzy/barr-lemonade.png' },
+        { id:'barr-limeade-24',      brand:'Barr', name:'Limeade (No Sugar)',   category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.42, sugarFree:true,  tagline:'Zingy lime',        image:'/assets/fizzy/barr-limeade.png' },
+        { id:'barr-bubblegum-24',    brand:'Barr', name:'Bubblegum (No Sugar)', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true,  tagline:'Retro vibe',        image:'/assets/fizzy/barr-bubblegum.png' },
+        { id:'barr-raspberryade-24', brand:'Barr', name:'Raspberryade (No Sugar)',category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:true, tagline:'Berry fizz',        image:'/assets/fizzy/barr-raspberryade.png' },
+        { id:'barr-cream-24',        brand:'Barr', name:'American Cream Soda',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:false, tagline:'Smooth & sweet',     image:'/assets/fizzy/barr-cream-soda.png' },
 
         { id:'rubicon-mango-sparkling-24', brand:'Rubicon', name:'Mango Sparkling', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic mango fizz', image:'/assets/fizzy/rubicon-mango-sparkling.png' },
 
@@ -156,12 +151,12 @@
         { id:'oj-pressed-6', brand:'Innocent',  name:'Orange (Pressed)',       category:'juice', packSize:6,  unitMl:1500, basePerUnit:3.20, tagline:'Carafe 1.5L' },
       ];
 
-      function computePrices(product){
-        const subPackPrice = product.basePerUnit * product.packSize;
+      function computePrices(p){
+        const subPackPrice = p.basePerUnit * p.packSize;
         const sub = round99(subPackPrice);
         const one = round99(sub * 1.25);
-        const perUnitSub = round99(sub / product.packSize);
-        const litres = (product.unitMl * product.packSize) / 1000;
+        const perUnitSub = round99(sub / p.packSize);
+        const litres = (p.unitMl * p.packSize) / 1000;
         const perLiter = Math.round((sub / litres) * 100) / 100;
         return { sub, one, perUnitSub, perLiter };
       }
@@ -171,7 +166,6 @@
         set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} },
       };
 
-      // ---------- UI ----------
       function CategoryChips({ value, onChange }){
         return (
           <div className="flex flex-wrap gap-2 fade-in">
@@ -228,5 +222,259 @@
               <div className="font-medium">{product.brand} — {product.name}</div>
               {highlight && <span className="tag text-blue-600 border-blue-300">Best value</span>}
             </div>
+            <div className="relative mb-2 overflow-hidden rounded-xl border img-wrap" style={{borderColor:'var(--acc-100)'}}>
+              <img
+                alt={`${product.brand} ${product.name}`}
+                loading="lazy"
+                src={product.image || svgThumb(product)}
+                onError={(e)=>{ e.currentTarget.classList.remove('drink-img'); e.currentTarget.style.mixBlendMode='normal'; e.currentTarget.src = svgThumb(product); }}
+                className="drink-img w-full h-36 object-contain p-2"
+                style={{ filter: 'drop-shadow(0 10px 14px rgba(0,0,0,.15))' }}
+              />
+            </div>
+            <div className="muted">{product.packSize}×{product.unitMl}ml • {product.tagline}</div>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {tags.map(t => <span key={t} className="tag text-xs">{t}</span>)}
+              <span className={`tag text-xs capitalize ${product.category==='water'? 'badge-water' : product.category==='fizzy'? 'badge-fizzy' : 'badge-juice'}`}>{product.category}</span>
+            </div>
+            <div className="flex items-end justify-between mt-2">
+              <div>
+                <div className="text-2xl font-semibold">{GBP(price)}</div>
+                <div className="text-xs muted">{isSub? 'per delivery (subscription)':'one-off price'}</div>
+              </div>
+              <div className="text-xs text-right muted">
+                <div>≈ {GBP(pr.perUnitSub)} / item (sub)</div>
+                <div>≈ {GBP(pr.perLiter)} / litre</div>
+              </div>
+            </div>
+            <button className="btn btn-primary w-full mt-3 active:scale-[.98]" onClick={(e)=>{ e.currentTarget.classList.add('pop'); setTimeout(()=>e.currentTarget.classList.remove('pop'), 260); onAdd({ id:product.id, brand:`${product.brand} — ${product.name}`, type, price }); }}>
+              Add to {isSub? 'subscription':'basket'}
+            </button>
+          </div>
+        );
+      }
 
-            {/* Image (tries asset, fall*
+      function Cart({ cart, setCart, onClose, onCheckout }){
+        const [address,setAddress] = React.useState("");
+        const [windowSlot,setWindowSlot] = React.useState("8–11 AM");
+        const [payment,setPayment] = React.useState("Apple Pay");
+        const totals = cart.reduce((s,i)=>s + i.price * (i.qty||1), 0);
+        function updateQty(id,type,d){ setCart(list=>list.map(x=>x.id===id && x.type===type ? {...x, qty:Math.max(1,(x.qty||1)+d)} : x)); }
+        function removeItem(id,type){ setCart(list=>list.filter(x=>!(x.id===id && x.type===type))); }
+        return (
+          <div className="fixed inset-0 bg-black/40 flex">
+            <div className="ml-auto w-full max-w-md h-full bg-white dark:bg-black p-4 overflow-auto text-gray-900 dark:text-gray-100 slide-in-right" style={{boxShadow:'-20px 0 40px rgba(0,0,0,.2)'}}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-lg font-semibold">Your basket</div>
+                <button className="btn" onClick={onClose}>Close</button>
+              </div>
+              {cart.length===0 ? (
+                <div className="muted">Your basket is empty.</div>
+              ) : (
+                <>
+                  {cart.map(item=> (
+                    <div key={`${item.id}-${item.type}`} className="card mb-2 flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium">
+                          {item.brand} <span className="tag ml-2">{item.type}</span>
+                        </div>
+                        <div className="text-xs muted">{GBP(item.price)} • qty {item.qty||1}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="btn" onClick={()=>updateQty(item.id,item.type,-1)}>-</button>
+                        <button className="btn" onClick={()=>updateQty(item.id,item.type,+1)}>+</button>
+                        <button className="btn" onClick={()=>removeItem(item.id,item.type)}>✕</button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="card text-sm mb-2">
+                    <div className="flex justify-between"><span>Total</span><span className="font-semibold">{GBP(totals)}</span></div>
+                  </div>
+                  <div className="space-y-2 mb-2">
+                    <input className="input" placeholder="Flat • Street • Town • Postcode" value={address} onChange={e=>setAddress(e.target.value)} />
+                    <select className="select" value={windowSlot} onChange={e=>setWindowSlot(e.target.value)}>
+                      {["8–11 AM","11 AM–2 PM","2–6 PM","6–9 PM"].map(w=> <option key={w} value={w}>{w}</option>)}
+                    </select>
+                    <select className="select" value={payment} onChange={e=>setPayment(e.target.value)}>
+                      {["Apple Pay","Google Pay","Visa","Mastercard"].map(p=> <option key={p} value={p}>{p}</option>)}
+                    </select>
+                  </div>
+                  <button className="btn btn-primary w-full" onClick={()=>onCheckout({ address, windowSlot, payment })}>Place order</button>
+                  <p className="text-xs muted text-center mt-2">Guest checkout allowed for one-off orders. Subscriptions require sign-in.</p>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      function SimplyDrinksApp(){
+        const [theme,setTheme] = React.useState(ls.get('sd-theme','light'));
+        React.useEffect(()=>{ document.documentElement.classList.toggle('dark', theme==='dark'); ls.set('sd-theme',theme); },[theme]);
+
+        const [user,setUser] = React.useState(ls.get('sd-user', null));
+        React.useEffect(()=>ls.set('sd-user', user),[user]);
+
+        const [tab,setTab] = React.useState('home');
+        const [cart,setCart] = React.useState(ls.get('sd-cart', []));
+        React.useEffect(()=>ls.set('sd-cart', cart),[cart]);
+
+        const [showCart,setShowCart] = React.useState(false);
+        const [lastOrder,setLastOrder] = React.useState(ls.get('sd-last-order', null));
+        React.useEffect(()=>ls.set('sd-last-order', lastOrder),[lastOrder]);
+
+        const [category,setCategory] = React.useState('all');
+        const [brandFilter,setBrandFilter] = React.useState('All');
+        const [q,setQ] = React.useState('');
+        const [sort,setSort] = React.useState('value');
+
+        React.useEffect(()=>{ setBrandFilter('All'); },[category]);
+
+        const visibleProducts = React.useMemo(()=>{
+          let list = PRODUCTS.slice();
+          if(category !== 'all') list = list.filter(p=>p.category===category);
+          if(brandFilter !== 'All') list = list.filter(p=>p.brand===brandFilter);
+          if(q.trim()){
+            const qq = q.trim().toLowerCase();
+            list = list.filter(p => (p.brand+" "+p.name+" "+(p.tagline||'')).toLowerCase().includes(qq));
+          }
+          list = list.map(p=>({ ...p, _prices: computePrices(p) }));
+          if(sort==='value') list.sort((a,b)=> a._prices.perLiter - b._prices.perLiter);
+          else if(sort==='price') list.sort((a,b)=> a._prices.sub - b._prices.sub);
+          else if(sort==='name') list.sort((a,b)=> (a.brand+a.name).localeCompare(b.brand+b.name));
+          return list;
+        },[category, brandFilter, q, sort]);
+
+        const brandsForCategory = React.useMemo(()=>{
+          if(category==='all') return [];
+          const pool = PRODUCTS.filter(p=>p.category===category);
+          return Array.from(new Set(pool.map(p=>p.brand)));
+        },[category]);
+
+        const bestValueId = React.useMemo(()=>{
+          let best=null; PRODUCTS.forEach(p=>{ const pr=computePrices(p); const score=pr.perLiter; if(!best||score<best.score) best={id:p.id,score}; });
+          return best?.id;
+        },[]);
+
+        function addToCart(item){
+          setCart(prev=>{
+            const i = prev.findIndex(x=>x.id===item.id && x.type===item.type);
+            if(i>=0){ const copy=[...prev]; copy[i].qty+=1; return copy; }
+            return [...prev,{...item,qty:1}];
+          });
+          setShowCart(true);
+        }
+
+        function checkout({ address, windowSlot, payment }){
+          const subscription = cart.some(i=>i.type==='subscription');
+          if(subscription && !user){ alert('Please sign in to start a subscription.'); return; }
+          if(!address || address.trim().length<6){ alert('Please enter your delivery address.'); return; }
+          const order={ id:`SD-${Date.now()}`, items:cart, address, window:windowSlot, paymentMethod:payment, ts:new Date().toISOString() };
+          setLastOrder(order); setCart([]); setShowCart(false); alert("Order placed! You'll get a confirmation shortly.");
+        }
+
+        const best = PRODUCTS.find(p=>p.id===bestValueId) || PRODUCTS[0];
+        const searchPlaceholder = category==='all' ? 'Search brand, drink, flavour…' : `Search ${CATEGORIES.find(c=>c.id===category).label.toLowerCase()}…`;
+
+        return (
+          <div className={`theme-cat-${category} max-w-5xl mx-auto p-4`}>
+            <div className="sticky top-0 bg-white/70 dark:bg-black/70 backdrop-blur border-b mb-4">
+              <div className="max-w-5xl mx-auto p-3">
+                <div className="flex items-center gap-3">
+                  <div className="font-semibold text-lg">Fizz & Flow</div>
+                  <span className="tag">Keep the fizz. Feel the flow.</span>
+                  <div className="ml-auto flex items-center gap-2">
+                    {!user && <span className="tag">Guest</span>}
+                    <button className="btn" onClick={()=>setTheme(theme==='light'?'dark':'light')}>{theme==='light'? 'Dark':'Light'}</button>
+                    <button className="btn" onClick={()=>setShowCart(true)}>Cart ({cart.reduce((s,i)=>s+(i.qty||1),0)})</button>
+                  </div>
+                </div>
+                <div className="hdr-grad mt-3"></div>
+              </div>
+            </div>
+
+            {(tab==='subscribe' || tab==='shop' || (!lastOrder && tab==='home')) && (
+              <div className="space-y-3 mb-3">
+                <CategoryChips value={category} onChange={setCategory} />
+                {category!=='all' && <BrandChips value={brandFilter} onChange={setBrandFilter} brands={brandsForCategory} />}
+                <div className="grid sm:grid-cols-3 gap-2">
+                  <input className="input" placeholder={searchPlaceholder} value={q} onChange={e=>setQ(e.target.value)} />
+                  <select className="select sm:col-span-1" value={sort} onChange={e=>setSort(e.target.value)}>
+                    <option value="value">Sort: Best value</option>
+                    <option value="price">Sort: Lowest price</option>
+                    <option value="name">Sort: Name</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {tab==='home' && (
+              <div className="space-y-4">
+                <Hero best={best} />
+                {lastOrder ? (
+                  <div className="card flex items-center justify-between fade-in">
+                    <div className="text-sm">
+                      <div className="font-medium">Quick Reorder</div>
+                      <div className="muted">{lastOrder.items.map(i=>i.brand).join(', ')}</div>
+                    </div>
+                    <button className="btn btn-primary" onClick={()=>{ setCart(lastOrder.items.map(i=>({...i}))); setShowCart(true); }}>Order again</button>
+                  </div>
+                ) : (
+                  <div className="card fade-in">
+                    <div className="font-medium mb-2">Start a subscription</div>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {(visibleProducts.length?visibleProducts:PRODUCTS).map(p => (
+                        <ProductCard key={`home-${p.id}`} product={p} type="subscription" highlight={p.id===bestValueId} onAdd={addToCart} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {tab==='subscribe' && (
+              <div className="space-y-3">
+                <div className="muted">Save ~20% vs one-off. Cancel anytime.</div>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {visibleProducts.map(p => (
+                    <ProductCard key={`sub-${p.id}`} product={p} type="subscription" highlight={p.id===bestValueId} onAdd={addToCart} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tab==='shop' && (
+              <div className="grid sm:grid-cols-2 gap-3">
+                {visibleProducts.map(p => (
+                  <ProductCard key={`shop-${p.id}`} product={p} type="one-off" highlight={p.id===bestValueId} onAdd={addToCart} />
+                ))}
+              </div>
+            )}
+
+            {tab==='account' && (
+              <div className="space-y-3">
+                <div className="card fade-in">
+                  <div className="font-medium mb-1">Account</div>
+                  <div className="text-sm">{user? 'Signed in' : 'Guest'}</div>
+                  {user && <button className="btn mt-2" onClick={()=>setUser(null)}>Log out</button>}
+                </div>
+                {lastOrder && (
+                  <div className="card text-sm fade-in">
+                    <div className="font-medium">Last order</div>
+                    <div className="muted">{new Date(lastOrder.ts).toLocaleDateString('en-GB')}</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {showCart && <Cart cart={cart} setCart={setCart} onClose={()=>setShowCart(false)} onCheckout={checkout} />}
+          </div>
+        );
+      }
+
+      (function(){ try{ console.assert(round99(12.34)===12.99,'round99'); const p=computePrices(PRODUCTS[0]); console.assert(p.one>=p.sub,'pricing'); } catch(e){ console.warn('Test warning:', e); } })();
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<SimplyDrinksApp />);
+    </script>
+  </body>
+</html>
