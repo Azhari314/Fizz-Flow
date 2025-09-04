@@ -26,7 +26,7 @@
       .theme-cat-juice { --acc: #f59e0b; --acc-50:#fef3c7; --acc-100:#fde68a; }
       .theme-cat-all   { --acc: #8b5cf6; --acc-50:#ede9fe; --acc-100:#ddd6fe; }
 
-      +.chip { font-size:.875rem; padding:.375rem .75rem; border-radius:9999px; border:1px solid #d1d5db; color:#374151; background:#00000000; transition:all .2s; }
+      .chip { font-size:.875rem; padding:.375rem .75rem; border-radius:9999px; border:1px solid #d1d5db; color:#374151; background:#00000000; transition:all .2s; }
       .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
       .dark .chip { border-color:#374151; color:#e5e7eb; }
       .chip-active { background: var(--acc); color:#fff; border-color:transparent; }
@@ -63,10 +63,31 @@
 
       .hdr-grad { background: linear-gradient(90deg, var(--acc) 0%, #60a5fa 50%, #34d399 100%); height:3px; border-radius:9999px; }
 
-      /* image blending to hide white product backgrounds */
-      .img-wrap { background: #f5f7ff; } /* gentle backdrop, works everywhere */
-      .drink-img { mix-blend-mode:multiply; image-rendering:auto; }
-      .dark .drink-img { mix-blend-mode:screen; }
+      /* UPDATED: Consistent image container and styling */
+      .img-container {
+        width: 100%;
+        height: 200px; /* Fixed height for all images */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f7ff;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        position: relative;
+      }
+      .dark .img-container {
+        background: #1a202c;
+      }
+      .drink-img {
+        max-height: 80%; /* Limit height to 80% of container */
+        max-width: 80%;  /* Limit width to 80% of container */
+        object-fit: contain; /* Maintain aspect ratio without cropping */
+        mix-blend-mode: multiply;
+        image-rendering: auto;
+      }
+      .dark .drink-img {
+        mix-blend-mode: screen;
+      }
 
       /* on-page error box (shows JS errors if boot fails) */
       #boot-error { display:none; white-space:pre-wrap; background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; padding:12px; border-radius:12px; max-width:900px; margin:12px auto; }
@@ -78,7 +99,7 @@
     <div id="root">Loading…</div>
 
     <script>
-      // If anything throws during boot, show it on the page so it’s not just blank.
+      // Show boot errors in-page
       window.addEventListener('error', e => {
         const box = document.getElementById('boot-error');
         if (box) { box.style.display='block'; box.textContent = (e.error && e.error.stack) || e.message; }
@@ -207,48 +228,75 @@
         );
       }
 
-      function ProductCard({ product, type, onAdd, highlight }){
+      function ProductCard({ product, type, onAdd, highlight }) {
         const pr = computePrices(product);
         const isSub = type === 'subscription';
         const price = isSub ? pr.sub : pr.one;
         const tags = [];
-        if(product.category==='fizzy' && product.sugarFree) tags.push('Zero sugar');
-        if(product.category==='water') tags.push('Still');
-        if(product.category==='juice') tags.push('100% juice');
+        if (product.category === 'fizzy' && product.sugarFree) tags.push('Zero sugar');
+        if (product.category === 'water') tags.push('Still');
+        if (product.category === 'juice') tags.push('100% juice');
 
         return (
-          <div className={`card fade-in ${highlight? 'border-[var(--acc)]':''}`} style={{animationDelay: `${Math.random()*0.15}s`}}>
+          <div
+            className={`card group fade-in ${highlight ? 'border-[var(--acc)]' : ''}`}
+            style={{ animationDelay: `${Math.random() * 0.15}s` }}
+          >
             <div className="flex items-center justify-between">
               <div className="font-medium">{product.brand} — {product.name}</div>
               {highlight && <span className="tag text-blue-600 border-blue-300">Best value</span>}
             </div>
-            <div className="relative mb-2 overflow-hidden rounded-xl border img-wrap" style={{borderColor:'var(--acc-100)'}}>
+
+            {/* UPDATED: Consistent image container */}
+            <div className="img-container mb-3">
               <img
+                src={product.image || svgThumb(product)}
                 alt={`${product.brand} ${product.name}`}
                 loading="lazy"
-                src={product.image || svgThumb(product)}
-                onError={(e)=>{ e.currentTarget.classList.remove('drink-img'); e.currentTarget.style.mixBlendMode='normal'; e.currentTarget.src = svgThumb(product); }}
-                className="drink-img w-full h-36 object-contain p-2"
-                style={{ filter: 'drop-shadow(0 10px 14px rgba(0,0,0,.15))' }}
+                onError={(e) => {
+                  e.currentTarget.classList.remove('drink-img');
+                  e.currentTarget.style.mixBlendMode = 'normal';
+                  e.currentTarget.src = svgThumb(product);
+                }}
+                className="drink-img transition-transform duration-300 group-hover:scale-105"
               />
             </div>
+
             <div className="muted">{product.packSize}×{product.unitMl}ml • {product.tagline}</div>
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
+
+            <div className="flex items-center gap-1 mt-1 flex-wrap">
               {tags.map(t => <span key={t} className="tag text-xs">{t}</span>)}
-              <span className={`tag text-xs capitalize ${product.category==='water'? 'badge-water' : product.category==='fizzy'? 'badge-fizzy' : 'badge-juice'}`}>{product.category}</span>
+              <span
+                className={`tag text-xs capitalize ${
+                  product.category === 'water' ? 'badge-water'
+                  : product.category === 'fizzy' ? 'badge-fizzy'
+                  : 'badge-juice'
+                }`}
+              >
+                {product.category}
+              </span>
             </div>
+
             <div className="flex items-end justify-between mt-2">
               <div>
                 <div className="text-2xl font-semibold">{GBP(price)}</div>
-                <div className="text-xs muted">{isSub? 'per delivery (subscription)':'one-off price'}</div>
+                <div className="text-xs muted">{isSub ? 'per delivery (subscription)' : 'one-off price'}</div>
               </div>
               <div className="text-xs text-right muted">
                 <div>≈ {GBP(pr.perUnitSub)} / item (sub)</div>
                 <div>≈ {GBP(pr.perLiter)} / litre</div>
               </div>
             </div>
-            <button className="btn btn-primary w-full mt-3 active:scale-[.98]" onClick={(e)=>{ e.currentTarget.classList.add('pop'); setTimeout(()=>e.currentTarget.classList.remove('pop'), 260); onAdd({ id:product.id, brand:`${product.brand} — ${product.name}`, type, price }); }}>
-              Add to {isSub? 'subscription':'basket'}
+
+            <button
+              className="btn btn-primary w-full mt-3 active:scale-[.98]"
+              onClick={(e) => {
+                e.currentTarget.classList.add('pop');
+                setTimeout(() => e.currentTarget.classList.remove('pop'), 260);
+                onAdd({ id: product.id, brand: `${product.brand} — ${product.name}`, type, price });
+              }}
+            >
+              Add to {isSub ? 'subscription' : 'basket'}
             </button>
           </div>
         );
@@ -472,7 +520,14 @@
         );
       }
 
-      (function(){ try{ console.assert(round99(12.34)===12.99,'round99'); const p=computePrices(PRODUCTS[0]); console.assert(p.one>=p.sub,'pricing'); } catch(e){ console.warn('Test warning:', e); } })();
+      // tests
+      (function(){
+        try{
+          console.assert(round99(12.34)===12.99,'round99');
+          const p=computePrices(PRODUCTS[0]);
+          console.assert(p.one>=p.sub,'pricing');
+        } catch(e){ console.warn('Test warning:', e); }
+      })();
 
       ReactDOM.createRoot(document.getElementById('root')).render(<SimplyDrinksApp />);
     </script>
