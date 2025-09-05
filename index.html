@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fizz & Flow — Water, Fizzy Drinks & Juices</title>
+    <title>Fizz & Flow — Water, Fizzy Drinks </title>
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,17 +28,37 @@
 
       .chip { font-size:.875rem; padding:.375rem .75rem; border-radius:9999px; border:1px solid #d1d5db; color:#374151; background:#00000000; transition:all .2s; }
       .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
-      .dark .chip { border-color:#374151; color:#e5e7eb; }
-      .chip-active { background: var(--acc); color:#fff; border-color:transparent; }
-      .dark .chip-active { background: var(--acc); color:#000; }
+      .dark .chip { background:var(--acc); color:#000; border-color:white; }
+      .chip-active { background: var(--acc); color:#ffffff; border-color:#000; }
+      .dark .chip-active { background:white; color:black;  border-color: #ffffff; }
 
-      .btn { padding:.5rem .75rem; border-radius:.75rem; border:1px solid #d1d5db; background:#fff; color:#111827; transition:all .2s; }
-      .btn:hover { transform: translateY(-1px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
-      .dark .btn { border-color:#374151; background:#111827; color:#f3f4f6; }
-      .btn-primary { background:var(--acc); color:#111827; border-color:transparent; }
-      .btn-primary:hover { filter:saturate(1.1) brightness(1.05); }
-      .dark .btn-primary { background:#fff; color:#000; }
-
+     .btn {
+  padding:.5rem .75rem;
+  border-radius:.75rem;
+  border:1px solid rgba(139, 92, 246, 0.3);
+  background: var(--acc); /* Purple background */
+  color: white; /* White text */
+  transition:all .2s;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow:0 8px 24px rgba(139, 92, 246, 0.4);
+  filter: brightness(1.1);
+}
+.dark .btn {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+.btn-primary {
+  background:var(--acc);
+  color:white;
+  border-color:transparent;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+.btn-primary:hover {
+  filter:brightness(1.15);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+}
       .card { padding:1rem; border:1px solid #e5e7eb; border-radius:1rem; background:#fff; transition:transform .2s, box-shadow .2s, border-color .2s; }
       .card:hover { transform: translateY(-2px) scale(1.01); box-shadow:0 20px 40px rgba(0,0,0,.08); border-color:var(--acc-100); }
       .dark .card { border-color:#1f2937; background:#0a0a0a; }
@@ -63,31 +83,52 @@
 
       .hdr-grad { background: linear-gradient(90deg, var(--acc) 0%, #60a5fa 50%, #34d399 100%); height:3px; border-radius:9999px; }
 
-      /* UPDATED: Consistent image container and styling */
-      .img-container {
-        width: 100%;
-        height: 200px; /* Fixed height for all images */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f5f7ff;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        position: relative;
-      }
-      .dark .img-container {
-        background: #1a202c;
-      }
-      .drink-img {
-        max-height: 80%; /* Limit height to 80% of container */
-        max-width: 80%;  /* Limit width to 80% of container */
-        object-fit: contain; /* Maintain aspect ratio without cropping */
-        mix-blend-mode: multiply;
-        image-rendering: auto;
-      }
-      .dark .drink-img {
-        mix-blend-mode: screen;
-      }
+      /* UPDATED: Enhanced image container and styling */
+.img-container {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:#ffffff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px, rgb(0, 0, 0, .08); /* Soft shadow */
+  transition: all 0.3s ease;
+}
+      
+
+/* Hover effect for container */
+.card:hover .img-container {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgb(0, 0, 0);
+
+}
+.dark .img-container {
+background: #ffffff;       /* still white in dark mode */
+border: 1px solid #e5e7eb; /* same border in dark mode */
+
+}
+.drink-img {
+  max-height: 80%;
+  max-width: 80%;
+  object-fit: contain;
+  mix-blend-mode: normal;
+  transition: all 0.3s ease;
+}
+.dark .drink-img {
+  mix-blend-mode: normal;
+
+}
+.dark .card:hover .img-container 
+
+.dark .card:hover .drink-img {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)) 
+          brightness(1.1) 
+          contrast(1.15);
+}
 
       /* on-page error box (shows JS errors if boot fails) */
       #boot-error { display:none; white-space:pre-wrap; background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; padding:12px; border-radius:12px; max-width:900px; margin:12px auto; }
@@ -140,7 +181,7 @@
         { id:'all', label:'All' },
         { id:'water', label:'Water' },
         { id:'fizzy', label:'Fizzy drinks' },
-        { id:'juice', label:'Juices' },
+        
       ];
 
       /* Put images in your repo with these exact paths/names: */
@@ -164,40 +205,53 @@
         { id:'barr-cream-24',        brand:'Barr', name:'American Cream Soda',  category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.46, sugarFree:false, tagline:'Smooth & sweet',     image:'/assets/fizzy/barr-cream-soda.png' },
 
         { id:'rubicon-mango-sparkling-24', brand:'Rubicon', name:'Mango Sparkling', category:'fizzy', packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic mango fizz', image:'/assets/fizzy/rubicon-mango.png' },
-
-        // Juices
-        { id:'oj-12',        brand:'Tropicana', name:'Orange Juice (No Pulp)', category:'juice', packSize:12, unitMl:1000, basePerUnit:2.10, tagline:'100% squeezed' },
-        { id:'aj-12',        brand:'Tropicana', name:'Apple Juice',            category:'juice', packSize:12, unitMl:1000, basePerUnit:1.90, tagline:'100% pressed' },
-        { id:'smoothie-8',   brand:'Innocent',  name:'Strawberry Banana',      category:'juice', packSize:8,  unitMl:750,  basePerUnit:2.60, tagline:'Smoothie goodness' },
-        { id:'oj-pressed-6', brand:'Innocent',  name:'Orange (Pressed)',       category:'juice', packSize:6,  unitMl:1500, basePerUnit:3.20, tagline:'Carafe 1.5L' },
+        { id: 'rubicon-passion-fruit-sparkling-24', brand:'Rubicon', name:'Passion-Fruit', category:'fizzy',packSize:24, unitMl:330, basePerUnit:0.75, sugarFree:false, tagline:'Exotic passion fruit fizz', image:'/assets/fizzy/rubicon-passion-fruit.png' },
       ];
 
-      function computePrices(p){
-        const subPackPrice = p.basePerUnit * p.packSize;
-        const sub = round99(subPackPrice);
-        const one = round99(sub * 1.25);
-        const perUnitSub = round99(sub / p.packSize);
-        const litres = (p.unitMl * p.packSize) / 1000;
-        const perLiter = Math.round((sub / litres) * 100) / 100;
-        return { sub, one, perUnitSub, perLiter };
-      }
+    function computePrices(p) {
+  const subPackPrice = p.basePerUnit * p.packSize;
+  const sub = round99(subPackPrice);
+  const one = round99(sub * 1.25);
+  const perUnitSub = round99(sub / p.packSize);
+  const litres = (p.unitMl * p.packSize) / 1000;
+  const perLiter = Math.round((sub / litres) * 100) / 100;
+  return { sub, one, perUnitSub, perLiter };
+}
 
-      const ls = {
-        get:(k,f)=>{ try{const v=localStorage.getItem(k); return v?JSON.parse(v):f;}catch{return f;} },
-        set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} },
-      };
+const ls = {
+  get: (k, f) => {
+    try {
+      const v = localStorage.getItem(k);
+      return v ? JSON.parse(v) : f;
+    } catch {
+      return f;
+    }
+  },
+  set: (k, v) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(v));
+    } catch {
+      /* ignore storage errors */
+    }
+  },
+};
 
-      function CategoryChips({ value, onChange }){
-        return (
-          <div className="flex flex-wrap gap-2 fade-in">
-            {CATEGORIES.map(c => (
-              <button key={c.id} className={`chip ${value===c.id? 'chip-active':''}`} onClick={()=>onChange(c.id)} aria-pressed={value===c.id}>
-                {c.label}
-              </button>
-            ))}
-          </div>
-        );
-      }
+function CategoryChips({ value, onChange }) {
+  return (
+    <div className="flex flex-wrap gap-2 fade-in">
+      {CATEGORIES.map(c => (
+        <button
+          key={c.id}
+          className={`chip ${value === c.id ? 'chip-active' : ''}`}
+          onClick={() => onChange(c.id)}
+          aria-pressed={value === c.id}
+        >
+          {c.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
       function BrandChips({ value, onChange, brands }){
         if(!brands || brands.length<=1) return null;
@@ -230,7 +284,7 @@
 
       function ProductCard({ product, type, onAdd, highlight }) {
         const pr = computePrices(product);
-        const isSub = type === 'subscription';
+        const isSub = type === '';
         const price = isSub ? pr.sub : pr.one;
         const tags = [];
         if (product.category === 'fizzy' && product.sugarFree) tags.push('Zero sugar');
@@ -247,20 +301,20 @@
               {highlight && <span className="tag text-blue-600 border-blue-300">Best value</span>}
             </div>
 
-            {/* UPDATED: Consistent image container */}
-            <div className="img-container mb-3">
-              <img
-                src={product.image || svgThumb(product)}
-                alt={`${product.brand} ${product.name}`}
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.classList.remove('drink-img');
-                  e.currentTarget.style.mixBlendMode = 'normal';
-                  e.currentTarget.src = svgThumb(product);
-                }}
-                className="drink-img transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
+         {/* UPDATED: Enhanced image container */}
+<div className="img-container mb-3">
+  <img
+    src={product.image || svgThumb(product)}
+    alt={`${product.brand} ${product.name}`}
+    loading="lazy"
+    onError={(e) => {
+      e.currentTarget.classList.remove('drink-img');
+      e.currentTarget.style.mixBlendMode = 'normal';
+      e.currentTarget.src = svgThumb(product);
+    }}
+    className="drink-img"
+  />
+</div>
 
             <div className="muted">{product.packSize}×{product.unitMl}ml • {product.tagline}</div>
 
@@ -532,4 +586,5 @@
       ReactDOM.createRoot(document.getElementById('root')).render(<SimplyDrinksApp />);
     </script>
   </body>
-</html>
+</html>1q aa
+
